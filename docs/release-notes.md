@@ -1,4 +1,6 @@
-# DKYJ Director 0.7.0-preview.3
+# DKYJ Director 0.7.0-preview.4
+
+手机扫码现在直接打开取景界面，默认选择 Camera_Phone；不会停留在 Live 或历史录制机位。
 
 新增电脑顶栏与欢迎页「手机连接」入口，支持普通 / HTTPS 二维码、复制链接和证书引导；界面改为中性灰，场景色彩保留。
 

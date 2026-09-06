@@ -251,7 +251,7 @@ class Viewfinder:
         self.capture_busy = False
         self.closed = False
         self.servers = []
-        self.http_url = f'http://{self.ip}:8765/?token={self.token}'
+        self.http_url = f'http://{self.ip}:8765/?token={self.token}&phone=1'
         self.https_url = None
         self.state = {}
         overview_module().cleanup_saved_overviews()
@@ -267,7 +267,7 @@ class Viewfinder:
         key = RUNTIME / 'tls/server-key.pem'
         if cert.exists() and key.exists():
             self.start_http(8766, cert, key)
-            self.https_url = f'https://{self.ip}:8766/?token={self.token}'
+            self.https_url = f'https://{self.ip}:8766/?token={self.token}&phone=1'
         self.refresh_state()
         info = {'http_url': self.http_url, 'https_url': self.https_url, 'token': self.token,
                 'certificate_profile': self.http_url.replace('/?token=', '/local-camera.mobileconfig?token=')}
@@ -317,7 +317,10 @@ class Viewfinder:
             duplicate.data.animation_data_clear()
             duplicate.parent = None
             duplicate.constraints.clear()
-            duplicate.name = 'Camera_Live'
+            existing = self.scene.objects.get('Camera_Phone')
+            if existing:
+                existing.name = 'Camera_Phone_Source'
+            duplicate.name = 'Camera_Phone'
             for key in list(duplicate.keys()):
                 if key.startswith('previs_take_') or key == 'previs_created_at':
                     del duplicate[key]
@@ -327,6 +330,31 @@ class Viewfinder:
             camera = duplicate
             self.camera_resets[camera.name] = matrix.copy()
         return camera
+
+    def phone_camera(self):
+        camera = self.scene.objects.get('Camera_Phone')
+        if camera and camera.type == 'CAMERA':
+            self.scene.camera = camera
+        else:
+            source = self.camera()
+            camera = source.copy()
+            camera.data = source.data.copy()
+            camera.animation_data_clear()
+            camera.data.animation_data_clear()
+            camera.parent = None
+            camera.constraints.clear()
+            camera.matrix_world = source.matrix_world.copy()
+            camera.name = 'Camera_Phone'
+            for key in list(camera.keys()):
+                if key.startswith('previs_take_') or key == 'previs_created_at':
+                    del camera[key]
+            self.scene.collection.objects.link(camera)
+            self.scene.camera = camera
+        self.local_camera()
+        self.control_hold = False
+        self.sensor_base = None
+        self.move = Vector((0, 0, 0))
+        return self.scene.camera
 
     def recorded_take_info(self, name=None):
         camera = self.scene.objects.get(name or self.take_name)
@@ -470,6 +498,9 @@ class Viewfinder:
             if self.recorded_take_info(self.camera().name):
                 self.control_hold = True
         elif kind == 'camera' and not self.recording:
+            if event.get('name') == 'Camera_Phone':
+                self.phone_camera()
+                return
             camera = self.scene.objects.get(event.get('name', ''))
             if camera and camera.type == 'CAMERA':
                 self.scene.camera = camera

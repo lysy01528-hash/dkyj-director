@@ -77,3 +77,9 @@ The Windows discovery test clears the environment to isolate Blender installs. I
 - Changed interface colors to neutral grayscale while preserving scene, actor and exported video colors.
 - Corrected the isolated Windows CI test user-home environment.
 - Excluded proxy benchmark addresses and interface broadcast addresses from phone pairing links.
+
+## 0.7.0-preview.4 — 2026-09-07
+
+- Phone pairing links open the viewfinder directly and select Camera_Phone once per project; legacy iPhone links also select the phone camera.
+- Live control copies use Camera_Phone; animated source cameras and recorded takes remain intact.
+- Recorded camera motion and export ownership regression checks pass.

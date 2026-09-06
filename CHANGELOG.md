@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.7.0-preview.4 — 2026-09-07
+
+- Phone pairing links open the viewfinder directly and select Camera_Phone once per project; legacy iPhone links also select the phone camera.
+- Live control copies use Camera_Phone; animated source cameras and recorded takes remain intact.
+- Recorded camera motion and export ownership regression checks pass.
+
+
 ## 0.7.0-preview.3 — 2026-09-07
 
 - Added prominent phone-pairing buttons to the desktop header and welcome page, with local QR codes, copyable links and iPhone Safari setup instructions.

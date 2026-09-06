@@ -1,7 +1,7 @@
 """Create an allowlisted source distribution, never copy working projects or credentials."""
 import argparse,hashlib,json,shutil,zipfile
 from pathlib import Path
-ROOT=Path(__file__).resolve().parents[1];VERSION='0.7.0-preview.3';name='dkyj-director-'+VERSION
+ROOT=Path(__file__).resolve().parents[1];VERSION='0.7.0-preview.4';name='dkyj-director-'+VERSION
 files=['samples/README.md','samples/room-pov.mp4','samples/room-overview.mp4','samples/steamship-pov.mp4','samples/steamship-overview.mp4','samples/room-preview.jpg','docs/release-notes.md','scripts/network_utils.py','scripts/windows_entry.py','tests/test_platform.py','docs/windows.md','Install DKYJ Director.cmd','Launch DKYJ Director.cmd','docs/release-check.md','.github/assets/dkyj-director-hand-eye.png','tests/test_export_files.py','docs/export-formats.md','docs/logo-generation.md','addon/scene_briefs.py','web/welcome.js','scripts/agent_server.py','scripts/director_client.py','scripts/agent_config.py','requirements-agent.txt','tests/test_briefs.py','docs/trial-guide.md','README.zh-CN.md','AGENT_GUIDE.md','Launch DKYJ Director.command','docs/agent-setup.md','docs/github-publishing.md','scripts/doctor.py','README.md','LICENSE','CHANGELOG.md','.gitignore','requirements.txt','打开大开眼界导演台.command',
 'addon/whitebox_webcam.py','addon/whitebox_overview.py','addon/scene_projects.py',
 'web/index.html','web/app.css','web/app.js','web/overview.js','web/projects.js',

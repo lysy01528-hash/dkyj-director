@@ -73,7 +73,7 @@ assert info and info['name'] == take.name and info['frames'] >= 24 and info['has
 result['checks']['post_stop_sensor_hold'] = True; result['take_info'] = info
 
 s.process({'type': 'resume_live'}); live = scene.camera
-assert live.name == 'Camera_Live' and not live.get('previs_take_start')
+assert live.name == 'Camera_Phone' and not live.get('previs_take_start')
 assert s.recorded_take_info(take.name)['name'] == take.name
 result['checks']['resume_live_explicit'] = True
 
