@@ -83,3 +83,7 @@ The Windows discovery test clears the environment to isolate Blender installs. I
 - Phone pairing links open the viewfinder directly and select Camera_Phone once per project; legacy iPhone links also select the phone camera.
 - Live control copies use Camera_Phone; animated source cameras and recorded takes remain intact.
 - Recorded camera motion and export ownership regression checks pass.
+
+### 2026-09-07 · Download action visibility
+
+Changed the export download link into a solid green button with white text, arrow and keyboard focus outline. The remaining UI stays neutral gray; hidden downloads stay hidden.
