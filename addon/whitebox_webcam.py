@@ -124,6 +124,21 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
             return self.send_bytes(200, file.read_bytes(), mimetypes.guess_type(file.name)[0] or 'text/plain')
         if not self.authorized():
             return
+        if path == '/phone-qr.png':
+            mode = urllib.parse.parse_qs(urllib.parse.urlsplit(self.path).query).get('mode', ['http'])[0]
+            url = self.service.https_url if mode == 'https' else self.service.http_url
+            if not url:
+                return self.send_json(503, {'ok': False, 'error': 'HTTPS unavailable'})
+            cache = getattr(self.service, 'pairing_qr_cache', {})
+            if url not in cache:
+                python = ROOT / '.venv' / ('Scripts/python.exe' if sys.platform == 'win32' else 'bin/python')
+                try:
+                    result = subprocess.run([str(python), '-c', 'import sys,qrcode; qrcode.make(sys.stdin.read()).save(sys.stdout.buffer, format="PNG")'], input=url.encode(), capture_output=True, timeout=8, check=True)
+                    cache[url] = result.stdout
+                    self.service.pairing_qr_cache = cache
+                except (OSError, subprocess.SubprocessError):
+                    return self.send_json(503, {'ok': False, 'error': 'QR unavailable; use pairing link'})
+            return self.send_bytes(200, cache[url], 'image/png')
         if path == '/api/state':
             return self.send_json(200, self.service.state)
         if path == '/frame.png':

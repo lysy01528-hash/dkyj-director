@@ -10,7 +10,7 @@ import sys
 def usable_ipv4(value):
     try:
         ip = ipaddress.ip_address(value)
-        return ip.version == 4 and ip.is_private and not (ip.is_loopback or ip.is_link_local or ip.is_unspecified or ip.is_multicast)
+        return ip.version == 4 and any(ip in ipaddress.ip_network(net) for net in ('10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16'))
     except ValueError:
         return False
 
@@ -20,7 +20,7 @@ def interface_addresses(output, platform):
         lines = [line for line in output.splitlines() if 'IPv4' in line]
     else:
         lines = [line for line in output.splitlines() if line.strip().startswith('inet ')]
-    return list(dict.fromkeys(ip for line in lines for ip in re.findall(r'\b(?:\d{1,3}\.){3}\d{1,3}\b', line) if usable_ipv4(ip)))
+    return list(dict.fromkeys(ip for line in lines for ip in re.findall(r'\b(?:\d{1,3}\.){3}\d{1,3}\b', line)[:1] if usable_ipv4(ip)))
 
 
 def lan_addresses():

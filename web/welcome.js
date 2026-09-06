@@ -22,3 +22,13 @@ window.previsWelcome={render(s){state=s;if(!initialized){initialized=true;try{if
 if(pending){if(s.briefs?.items.some(b=>b.id===pending.id)){pending=null;submissionId=null;answers=['','','',''];saveDraft();step=0;draw();mode(true);$('briefNext').disabled=false;say('创作任务已保存，等待你的 Agent 接手。')}else if((s.error&&s.error!==pending.previousError)||Date.now()-pending.started>15000){say(s.error||'保存尚未确认，请先检查创作任务列表');pending=null;$('briefNext').disabled=false}}if(replyPending){if(s.briefs.revision>replyPending.revision)replyPending=null;else if((s.error&&s.error!==replyPending.previousError)||Date.now()-replyPending.started>15000){replyPending=null;signature='';say(s.error||'补充说明尚未确认，请检查任务记录')}}tasks()}};
 draw();
 })();
+
+(()=>{
+const $=id=>document.getElementById(id),dialog=$('phoneDialog');let current={},secure=false;
+function render(){const url=secure?current.https_url:current.http_url;const valid=!!url;$('phoneURL').value=url||'等待本机连接，请稍后重试';$('phoneCopy').disabled=!valid;$('phoneHTTPS').disabled=!current.https_url;$('phoneHTTPS').textContent=secure?'返回普通链接二维码':'切换体感 HTTPS 二维码';$('phoneOpen').hidden=!valid;$('phoneOpen').href=url||'#';$('phoneCert').hidden=!current.http_url;$('phoneCert').href=current.http_url?current.http_url.replace('/?token=','/local-camera.mobileconfig?token='):'#';$('phoneQR').hidden=!valid;if(valid){const token=new URL(current.http_url).searchParams.get('token');const src='/phone-qr.png?token='+encodeURIComponent(token)+'&mode='+(secure?'https':'http');if($('phoneQR').getAttribute('src')!==src){$('phoneQRStatus').textContent='正在准备二维码…';$('phoneQR').src=src;}}}
+$('phoneQR').onload=()=>{$('phoneQRStatus').textContent=secure?'体感 HTTPS · 请先信任本地证书':'手机相机扫码 · Safari 打开'};
+$('phoneQR').onerror=()=>{$('phoneQRStatus').textContent='二维码暂不可用，请复制右侧链接到手机 Safari'};
+document.querySelectorAll('[data-phone-connect]').forEach(btn=>btn.addEventListener('click',()=>{secure=false;render();dialog.showModal()}));$('phoneClose').onclick=()=>dialog.close();$('phoneHTTPS').onclick=()=>{secure=!secure;$('phoneFeedback').textContent='';render()};
+$('phoneCopy').onclick=async()=>{try{if(!navigator.clipboard)throw Error();await navigator.clipboard.writeText($('phoneURL').value);$('phoneFeedback').textContent='已复制，发到自己的 iPhone，用 Safari 打开。'}catch{const input=$('phoneURL');input.focus();input.select();const ok=document.execCommand('copy');$('phoneFeedback').textContent=ok?'已复制手机链接。':'链接已选中，请按 ⌘C（Windows 按 Ctrl+C）复制。'}};
+window.previsPhone={render(s){current=s;if(dialog.open)render()}};
+})();

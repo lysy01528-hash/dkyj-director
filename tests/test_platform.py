@@ -31,6 +31,10 @@ class PlatformTests(unittest.TestCase):
     def test_localized_ipconfig_excludes_gateway_and_linklocal(self):
         text='IPv4 地址 . . : 192.168.31.5(首选)\n默认网关 : 192.168.31.1\nIPv4 Address: 169.254.8.2\nIPv4 Address: 10.0.0.3'
         self.assertEqual(network.interface_addresses(text,'win32'), ['192.168.31.5','10.0.0.3'])
+    def test_phone_url_excludes_proxy_benchmark_network(self):
+        self.assertFalse(network.usable_ipv4('198.18.0.1'))
+        self.assertEqual(network.interface_addresses('inet 192.168.31.111 netmask 0xffffff00 broadcast 192.168.31.255', 'darwin'), ['192.168.31.111'])
+
     def test_mac_addresses(self):
         text='en0: flags\n\tinet 192.168.1.8 netmask 0xffffff00\n\tinet 127.0.0.1\n\tinet6 fe80::1'
         self.assertEqual(network.interface_addresses(text,'darwin'),['192.168.1.8'])

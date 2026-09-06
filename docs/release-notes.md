@@ -1,4 +1,6 @@
-# DKYJ Director 0.7.0-preview.2
+# DKYJ Director 0.7.0-preview.3
+
+新增电脑顶栏与欢迎页「手机连接」入口，支持普通 / HTTPS 二维码、复制链接和证书引导；界面改为中性灰，场景色彩保留。
 
 大开眼界导演台：在本地 Blender 中搭建简模、调整人物关键帧，通过 iPhone Safari 取景和录制摄影机轨迹。
 

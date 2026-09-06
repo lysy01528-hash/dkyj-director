@@ -41,3 +41,11 @@ Windows 自动搜索 Blender、虚拟环境路径、中文路径、中文字体�
 2026-09-06：本次重新通过 Python 编译、四个网页脚本语法检查、网页控制行为测试、2 项创作任务测试和 6 项平台分支测试。独立 Blender 进程重新通过项目场景／网格／动画隔离与磁盘重载、录制摄影机绑定、无录制导出拒绝、空间独立导出及缺失产物拒绝测试。
 
 公开案例使用明确文件清单：室内排练、蒸汽小船的历史 POV / 俯视视频，以及现有场景生成脚本。个人项目库与录制、QA、运行时目录均不进入发布目录。源码与双平台 ZIP 的内容、校验清单和本地文档链接在上传前检查。上述历史 Safari / Windows 真机验收边界仍适用。
+
+
+## 0.7.0-preview.3 · 2026-09-07
+
+- Native macOS Safari: header pairing button opens the dialog; HTTP QR loads, copy link confirms success, HTTPS switch updates URL and QR. Neutral UI verified visually; scene images retain color.
+- Local HTTP and HTTPS QR endpoints returned PNGs; requests without the pairing token returned 403.
+- Seven platform tests pass, including proxy benchmark network and broadcast address exclusions. Web controls behavioral checks pass.
+- Physical iPhone scanning and Windows GPU rendering are not newly verified by this update.

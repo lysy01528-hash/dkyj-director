@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.7.0-preview.3 — 2026-09-07
+
+- Added prominent phone-pairing buttons to the desktop header and welcome page, with local QR codes, copyable links and iPhone Safari setup instructions.
+- HTTP and HTTPS QR codes are generated locally and require the active pairing token; no external QR service is used.
+- Changed interface colors to neutral grayscale while preserving scene, actor and exported video colors.
+- Corrected the isolated Windows CI test user-home environment.
+- Excluded proxy benchmark addresses and interface broadcast addresses from phone pairing links.
+
+
 ## 0.7.0-preview.2 — 2026-09-06
 
 - First public preview distribution with separate macOS and Windows bundles.
