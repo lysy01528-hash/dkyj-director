@@ -17,7 +17,7 @@ class PlatformTests(unittest.TestCase):
             for version in ['5.2','5.10']:
                 file=root/('Blender Foundation/Blender '+version)/'blender.exe'
                 file.parent.mkdir(parents=True);file.touch()
-            with patch.object(paths, 'ROOT', root), patch.object(paths.sys, 'platform', 'win32'), patch.dict(os.environ, {'PROGRAMFILES':tmp, 'LOCALAPPDATA':tmp}, clear=True), patch.object(paths.shutil, 'which', return_value=None):
+            with patch.object(paths, 'ROOT', root), patch.object(paths.sys, 'platform', 'win32'), patch.dict(os.environ, {'PROGRAMFILES':tmp, 'LOCALAPPDATA':tmp, 'USERPROFILE':tmp, 'HOME':tmp}, clear=True), patch.object(paths.shutil, 'which', return_value=None):
                 self.assertIn('Blender 5.10', paths.blender_binary())
                 self.assertEqual(paths.project_python(root), root/'.venv/Scripts/python.exe')
     def test_invalid_explicit_blender_does_not_silently_fallback(self):

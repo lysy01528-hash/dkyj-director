@@ -63,3 +63,8 @@ v0.4 完成蒸汽小船动作、陈设、米制空间说明和三路同步导出
 v0.2–0.3 修正录制后机位被实时传感器覆盖及导出使用错误摄影机的问题，引入录制 Take 归属和停止后输入暂停。总览渲染采用先准备场景、后 GPU 绘制的方式，避免在绘制回调中切场景引起锁死。
 
 双平台改动后再次实际渲染 6 帧完整参考套件，并解码确认纯镜头与纯俯视 1280×720、空间板 1920×1080、上下拼版 1920×2160，四路均为 6 帧。隔离目录生成的 HTTPS 证书 SAN 与共享 IP 列表一致；未替换当前会话证书。两个 ZIP 已核对 CRC、逐文件 SHA-256 与平台启动脚本分离。以上实际渲染在 Mac 完成，不能代替 Windows 显卡测试。
+
+
+### 2026-09-07 · GitHub CI fixture correction
+
+The Windows discovery test clears the environment to isolate Blender installs. It now supplies HOME and USERPROFILE for its temporary user directory, so Path.home() works on native Windows runners. Application code and the preview.2 release bundles are unchanged.
