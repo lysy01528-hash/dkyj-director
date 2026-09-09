@@ -49,3 +49,8 @@ Windows 自动搜索 Blender、虚拟环境路径、中文路径、中文字体�
 - Local HTTP and HTTPS QR endpoints returned PNGs; requests without the pairing token returned 403.
 - Seven platform tests pass, including proxy benchmark network and broadcast address exclusions. Web controls behavioral checks pass.
 - Physical iPhone scanning and Windows GPU rendering are not newly verified by this update.
+
+
+## 0.7.0-preview.5 · 2026-09-09
+
+删除 Take / Scene 与失效 RNA 修复，通过八项删除回归、七种总览清理场景、项目缓存重新加载、录制导出回归，以及原生视窗中的 GPU/HTTP/Undo 恢复检查。测试在 macOS Blender 5.2.1 上执行。[完整修复记录](fixes/deleted-camera-recovery.md)。

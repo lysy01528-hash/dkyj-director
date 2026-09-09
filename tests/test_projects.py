@@ -22,6 +22,14 @@ with tempfile.TemporaryDirectory() as directory:
     for f in [1,24]:restored.frame_set(f);samples.append(restored.camera.location.x)
     assert abs(samples[1]-samples[0]-4)<.001,samples
     assert fresh.catalog['active']==pid and fresh.entry(pid)['description']=='Test copy'
+    # Deleted cached Scene wrappers must fall back to the on-disk project.
+    bpy.context.window.scene=scene
+    bpy.data.scenes.remove(restored)
+    replacement=fresh.load(pid)
+    assert replacement.camera.data.lens==70
+    assert fresh.scene_is_live(replacement)
+    try:fresh.write_scene(restored,pid);raise AssertionError('removed scene accepted')
+    except ValueError:pass
     try:store.path('../escape');raise AssertionError('path accepted')
     except ValueError:pass
     # Missing project files cannot silently substitute another scene.

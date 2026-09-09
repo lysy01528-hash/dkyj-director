@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.7.0-preview.5 — 2026-09-09
+
+- Recover the phone camera after externally deleting active takes; interrupt a deleted recording safely without keying another camera.
+- Validate Scene/Object identities, discard deleted project caches and rebuild stale overview rigs; make helper cleanup repeatable.
+- Release GPU resources before undo/redo/file loading and prevent state-refresh exceptions from terminating the web timer.
+- Keep the green export download button on the neutral gray interface.
+- Verified in Blender 5.2.1 on macOS: eight deletion regressions, seven overview cleanup cases, native GPU/HTTP recovery including Undo, project reload and recorded-export regressions.
+- Reproduction, upgrade instructions and validation limits: [deleted-camera recovery](docs/fixes/deleted-camera-recovery.md).
+
+
 ## 0.7.0-preview.4 — 2026-09-07
 
 - Phone pairing links open the viewfinder directly and select Camera_Phone once per project; legacy iPhone links also select the phone camera.

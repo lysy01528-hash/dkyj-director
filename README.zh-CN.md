@@ -1,6 +1,6 @@
 # DKYJ Director
 
-**0.7.0-preview.4 公开预览版** · [室内与蒸汽小船案例](samples/README.md) · [版本说明](docs/release-notes.md)
+**0.7.0-preview.5 公开预览版** · [室内与蒸汽小船案例](samples/README.md) · [版本说明](docs/release-notes.md)
 
 
 <img src=".github/assets/dkyj-director-hand-eye.png" width="220" alt="DKYJ Director hand-drawn logo">

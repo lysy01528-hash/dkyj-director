@@ -87,3 +87,12 @@ The Windows discovery test clears the environment to isolate Blender installs. I
 ### 2026-09-07 · Download action visibility
 
 Changed the export download link into a solid green button with white text, arrow and keyboard focus outline. The remaining UI stays neutral gray; hidden downloads stay hidden.
+
+
+## 2026-09-09 · 删除 Take / Scene 后的实时连接恢复
+
+用户报告：网页保持实时连接时在 Blender 删除多条 Camera_Take_*，再次录制失败，并出现 StructRNA of type Scene has been removed。独立场景复现了相同 ReferenceError、网页 timer 错误恢复再次抛异常，以及录制相机删除后仍给其他机位写关键帧的风险。没有据此断言所有用户遇到的进程崩溃都来自同一原因。
+
+修复相机录制归属、Scene/Object 有效性验证、总览资源清理、项目缓存失效、Undo/Redo/文件加载前释放绘制资源，并为异常状态提供不访问旧 RNA 的 JSON 回退。删除当前镜头后保留其他机位与已有录制；缺少相机时恢复 Camera_Phone。
+
+已通过 8 项删除回归、7 种总览清理场景、7 项原生视窗/GPU/HTTP/Undo 检查，项目缓存重新加载与录制导出回归通过。实际测试环境：macOS / Blender 5.2.1 LTS；未验证 Windows 原生 GPU。详见 [修复记录](fixes/deleted-camera-recovery.md)。

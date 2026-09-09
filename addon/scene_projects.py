@@ -40,6 +40,7 @@ class ProjectStore:
 
     def write_scene(self,scene,project_id):
         import bpy
+        if not self.scene_is_live(scene):raise ValueError('场景已移除，请重新打开项目后保存')
         p=self.entry(project_id);dest=self.path(project_id);dest.parent.mkdir(parents=True,exist_ok=True)
         scene['dkyj_project_id']=project_id
         for ob in scene.objects:ob['dkyj_saved_name']=ob.name
@@ -54,10 +55,18 @@ class ProjectStore:
         self.cache[project_id]=scene
         self.persist()
 
+    @staticmethod
+    def scene_is_live(scene):
+        import bpy
+        try:return scene is not None and bpy.data.scenes.get(scene.name) == scene
+        except ReferenceError:return False
+
     def load(self,project_id):
         import bpy
         self.entry(project_id)
-        if project_id in self.cache and self.cache[project_id].name in bpy.data.scenes:return self.cache[project_id]
+        cached=self.cache.get(project_id)
+        if self.scene_is_live(cached):return cached
+        self.cache.pop(project_id,None)
         file=self.path(project_id)
         if not file.is_file():raise ValueError('项目文件不存在；当前场景保持不变')
         with bpy.data.libraries.load(str(file),link=False) as (data,loaded):

@@ -40,6 +40,38 @@ TAKES = ROOT / 'takes'
 WIDTH, HEIGHT = 768, 432
 SERVICE = None
 
+def id_identity(value):
+    """Store an ID identity, never an RNA wrapper, across timer/draw callbacks."""
+    try:
+        return (value.as_pointer(), value.session_uid) if value is not None else None
+    except (ReferenceError, AttributeError):
+        return None
+
+def live_id(value, collection):
+    try:
+        return value is not None and collection.get(value.name) == value
+    except ReferenceError:
+        return False
+
+def json_list(scene, key):
+    try:
+        data = json.loads(scene.get(key, '[]'))
+        return data if isinstance(data, list) else []
+    except (ValueError, TypeError):
+        return []
+
+@bpy.app.handlers.persistent
+def release_before_data_change(*_):
+    """GPU scenes must be detached before file load or undo invalidates IDs."""
+    if SERVICE and not SERVICE.closed:
+        SERVICE.interrupt_recording('撤销、重做或打开文件后，已停止旧镜头的录制')
+        SERVICE.events.clear()
+        SERVICE.dispose_overview()
+        SERVICE.release_offscreen('offscreen')
+        SERVICE.frame_bytes = b''
+        SERVICE._needs_resync = True
+        SERVICE.refresh_state()
+
 def overview_module():
     directory = str(ROOT / 'addon')
     if directory not in sys.path:
@@ -279,7 +311,88 @@ class Viewfinder:
 
     @property
     def scene(self):
-        return self.window.scene
+        # Opening/deleting a scene and undo can invalidate the old Window/Scene.
+        try:
+            scene = self.window.scene
+            if live_id(scene, bpy.data.scenes) and not scene.get('previs_overview_owned'):
+                return scene
+        except ReferenceError:
+            pass
+        for window in bpy.context.window_manager.windows:
+            scene = window.scene
+            if live_id(scene, bpy.data.scenes) and not scene.get('previs_overview_owned'):
+                self.window = window
+                return scene
+        raise ReferenceError('当前场景已移除，请在 Blender 中打开一个场景')
+
+    def valid_camera(self, camera):
+        try:
+            return (live_id(camera, bpy.data.objects) and camera.type == 'CAMERA'
+                    and self.scene.objects.get(camera.name) == camera
+                    and live_id(camera.data, bpy.data.cameras))
+        except ReferenceError:
+            return False
+
+    def recording_camera(self):
+        identity = getattr(self, '_recording_identity', None)
+        for camera in self.scene.objects:
+            if id_identity(camera) == identity and self.valid_camera(camera):
+                if id_identity(camera.data) == getattr(self, '_recording_data_identity', None):
+                    return camera
+        return None
+
+    def interrupt_recording(self, message):
+        # Do not finalize/key a deleted take or an unrelated active camera.
+        self.recording = self.playing = False
+        self._recording_identity = self._recording_data_identity = None
+        self.move = Vector((0, 0, 0))
+        self.sensor_base = None
+        self.control_hold = True
+        self.last_record_frame = -1
+        self.last_record_quaternion = self.take_first_pose = None
+        self.error = message
+
+    def sync_scene_data(self):
+        scene = self.scene
+        identity = id_identity(scene)
+        previous = getattr(self, '_scene_identity', None)
+        if previous != identity or getattr(self, '_needs_resync', False):
+            if previous is not None:
+                self.interrupt_recording('场景已变更，已停止旧场景的录制；可以重新开始')
+                self.events.clear()
+                self.dispose_overview()
+                self.release_offscreen('offscreen')
+                self.frame_bytes = b''
+                self.camera_resets = {}
+                self._last_camera_pose = None
+                self.take_name = scene.get('previs_last_take', '')
+                if getattr(self, 'projects', None):
+                    self.projects.attach(scene)
+            self._scene_identity = identity
+            self._needs_resync = False
+        if self.recording and self.recording_camera() is None:
+            self.interrupt_recording('录制相机已删除或移出场景，已停止录制；请重新开始')
+            self.events.clear()
+        elif self.recording:
+            self.take_name = self.recording_camera().name
+            scene['previs_last_take'] = self.take_name
+        if self.take_name and not self.recorded_take_info():
+            self.take_name = ''
+            if 'previs_last_take' in scene:
+                del scene['previs_last_take']
+        self.camera_resets = {name: pose for name, pose in self.camera_resets.items()
+                              if self.valid_camera(scene.objects.get(name))}
+        self.camera()
+        return scene
+
+    def release_offscreen(self, attribute):
+        buffer = getattr(self, attribute, None)
+        setattr(self, attribute, None)
+        if buffer is not None:
+            try:
+                buffer.free()
+            except (ReferenceError, RuntimeError):
+                pass
 
     def start_http(self, port, cert=None, key=None):
         server = LocalHTTPServer(('0.0.0.0', port), RequestHandler)
@@ -301,10 +414,32 @@ class Viewfinder:
 
     def camera(self):
         camera = self.scene.camera
-        if not camera:
-            raise ValueError('请先在 Blender 场景中添加摄影机')
+        if self.recording:
+            owner = self.recording_camera()
+            if owner is None:
+                self.interrupt_recording('录制相机已删除或移出场景，已停止录制；请重新开始')
+            else:
+                camera = owner
+                self.scene.camera = owner
+        if not self.valid_camera(camera):
+            camera = next((o for o in self.scene.objects if self.valid_camera(o)
+                           and o.name.split('.')[0] == 'Camera_Phone'), None)
+            if camera is None:
+                camera = bpy.data.objects.new('Camera_Phone', bpy.data.cameras.new('PhoneCameraData'))
+                self.scene.collection.objects.link(camera)
+                camera.rotation_mode = 'QUATERNION'
+                pose = getattr(self, '_last_camera_pose', None)
+                if pose:
+                    camera.matrix_world, camera.data.lens = pose[0].copy(), pose[1]
+                else:
+                    camera.location = (0, -8, 3)
+                    camera.rotation_quaternion = (Vector((0, 0, 1)) - camera.location).to_track_quat('-Z', 'Y')
+            self.scene.camera = camera
+            self.sensor_base = None
+            self.move = Vector((0, 0, 0))
         if camera.name not in self.camera_resets:
             self.camera_resets[camera.name] = camera.matrix_world.copy()
+        self._last_camera_pose = (camera.matrix_world.copy(), camera.data.lens)
         return camera
 
     def local_camera(self):
@@ -358,7 +493,7 @@ class Viewfinder:
 
     def recorded_take_info(self, name=None):
         camera = self.scene.objects.get(name or self.take_name)
-        if (not camera or camera.type != 'CAMERA' or 'previs_take_start' not in camera
+        if (not self.valid_camera(camera) or 'previs_take_start' not in camera
                 or not camera.animation_data or not camera.animation_data.action):
             return None
         start = int(camera['previs_take_start'])
@@ -368,8 +503,13 @@ class Viewfinder:
                 'has_motion': bool(camera.get('previs_take_motion', False))}
 
     def record_key(self):
+        if not self.recording:
+            return
+        camera = self.recording_camera()
+        if camera is None:
+            self.interrupt_recording('录制相机已删除或移出场景，已停止录制；请重新开始')
+            return
         frame = self.scene.frame_current
-        camera = self.camera()
         # q and -q are the same orientation, but opposite signs in adjacent
         # component F-curves can produce a spin through zero on playback.
         previous = getattr(self, 'last_record_quaternion', None)
@@ -392,8 +532,8 @@ class Viewfinder:
         camera['previs_take_end'] = self.take_end
 
     def linearize_take(self):
-        camera = self.scene.camera
-        if not camera:
+        camera = self.recording_camera()
+        if camera is None:
             return
         for obj in [camera, camera.data]:
             action = obj.animation_data.action if obj.animation_data else None
@@ -409,6 +549,7 @@ class Viewfinder:
                                     key.interpolation = 'LINEAR'
 
     def process(self, event):
+        self.sync_scene_data()
         kind = event['type']
         if kind == 'input':
             if getattr(self, 'control_hold', False):
@@ -476,7 +617,10 @@ class Viewfinder:
                 camera['previs_take_motion'] = False
                 camera['previs_created_at'] = time.time()
                 self.recording = True
+                self._recording_identity = id_identity(camera)
+                self._recording_data_identity = id_identity(camera.data)
                 self.record_key()
+                self.error = ''
                 self.export_state = {'status': 'idle'}
             elif self.recorded_take_info(self.camera().name):
                 self.control_hold = True
@@ -489,6 +633,7 @@ class Viewfinder:
                 self.linearize_take()
                 self.control_hold = True
             self.recording = False
+            self._recording_identity = self._recording_data_identity = None
             self.playing = False
             self.move = Vector((0, 0, 0))
         elif kind == 'seek' and not self.recording:
@@ -589,7 +734,13 @@ class Viewfinder:
         dt = min(now - self.last_tick, 0.1)
         self.last_tick = now
         try:
-            if self.area not in self.window.screen.areas[:] or self.area.type != 'VIEW_3D':
+            self.sync_scene_data()
+            try:
+                view_valid = (self.area in self.window.screen.areas[:] and self.area.type == 'VIEW_3D'
+                              and self.space == self.area.spaces.active and self.region in self.area.regions[:])
+            except ReferenceError:
+                view_valid = False
+            if not view_valid:
                 area = next((a for a in self.window.screen.areas if a.type == 'VIEW_3D'), None)
                 if area is None:
                     self.error = '请让 Blender 保留一个可见的 3D 视图'
@@ -598,10 +749,16 @@ class Viewfinder:
                 self.area = area
                 self.region = next(r for r in area.regions if r.type == 'WINDOW')
                 self.space = area.spaces.active
+                self.release_offscreen('offscreen')
+                self.release_offscreen('overview_offscreen')
             # Remember the live transform before advancing scene animation evaluates its action.
             live_matrix = self.camera().matrix_world.copy() if self.recording else None
             while self.events:
-                self.process(self.events.popleft())
+                event = self.events.popleft()
+                try:
+                    self.process(event)
+                except (ValueError, ReferenceError) as error:
+                    self.error = str(error)
                 self.window.view_layer.update()
             if self.playing:
                 fps = self.scene.render.fps / self.scene.render.fps_base
@@ -609,9 +766,10 @@ class Viewfinder:
                 if self.recording:
                     live_matrix = self.camera().matrix_world.copy()
                 selected_camera = self.camera()
+                selected_identity = id_identity(selected_camera)
                 pinned_camera = self.recording or bool(self.recorded_take_info(selected_camera.name))
                 self.scene.frame_set(frame)
-                if pinned_camera:
+                if pinned_camera and self.valid_camera(selected_camera) and id_identity(selected_camera) == selected_identity:
                     self.scene.camera = selected_camera
                 if self.recording and live_matrix is not None:
                     self.camera().matrix_world = live_matrix
@@ -647,10 +805,13 @@ class Viewfinder:
         now = time.monotonic()
         if self.closed or self.capture_busy or now - self.last_draw < 0.12:
             return
-        if bpy.context.area != self.area or bpy.context.region != self.region or not self.scene.camera:
-            return
         self.capture_busy = True
         try:
+            scene = self.scene
+            if (bpy.context.area != self.area or bpy.context.region != self.region
+                    or id_identity(scene) != getattr(self, '_scene_identity', None)
+                    or not self.valid_camera(scene.camera)):
+                return
             if self.offscreen is None:
                 self.offscreen = gpu.types.GPUOffScreen(WIDTH, HEIGHT)
             camera = self.scene.camera
@@ -680,26 +841,34 @@ class Viewfinder:
 
     def dispose_overview(self):
         rig = getattr(self, 'overview_rig', None)
-        if rig:
-            rig.close()
+        # Detach first: a failed cleanup must never leave the next draw using it.
         self.overview_rig = None
+        self.overview_signature = None
         self.overview_bytes = b''
         self.overview_frame = None
+        self.release_offscreen('overview_offscreen')
+        if rig:
+            try:
+                rig.close()
+            except (ReferenceError, RuntimeError):
+                pass
 
     def prepare_overview(self):
         # Scene edits and dependency evaluation must run outside the GPU draw
         # callback. Changing context there can deadlock Blender's draw manager.
         try:
             module = overview_module()
-            signature = (json.dumps(module.read_zones(self.scene), sort_keys=True),
-                         tuple(sorted(o.name for o in self.scene.objects if not o.hide_render)))
-            if self.overview_rig is None or signature != getattr(self, 'overview_signature', None):
+            signature = (id_identity(self.scene), json.dumps(module.read_zones(self.scene), sort_keys=True),
+                         tuple(sorted((o.name, id_identity(o), id_identity(o.data)) for o in self.scene.objects if not o.hide_render)))
+            if (self.overview_rig is None or not self.overview_rig.is_valid()
+                    or signature != getattr(self, 'overview_signature', None)):
                 self.dispose_overview()
                 self.overview_rig = module.OverviewRig(self.scene)
                 self.overview_signature = signature
             self.overview_rig.update(self.scene.camera, self.scene.frame_current)
             self.overview_error = ''
         except Exception as error:
+            self.dispose_overview()
             self.overview_error = '空间总览：' + str(error)
 
     def draw_overview(self):
@@ -709,6 +878,8 @@ class Viewfinder:
         self.last_overview_capture=time.monotonic()
         width,height=1280,720
         try:
+            if not rig.is_valid() or id_identity(rig.source_scene) != id_identity(self.scene):
+                return
             view_layer = rig.scene.view_layers[0]
             camera = rig.scene.camera
             matrix = camera.calc_matrix_camera(bpy.context.evaluated_depsgraph_get(), x=width, y=height)
@@ -812,7 +983,23 @@ class Viewfinder:
             self.export_process = None
 
     def refresh_state(self):
+        # A timer callback is unregistered by Blender if its error handler raises.
+        # Always publish a JSON-only fallback rather than dereference stale RNA twice.
+        try:
+            self._refresh_state()
+        except Exception as error:
+            self.state = {'ok': True, 'connected': False, 'camera': '', 'cameras': [],
+                'recorded_take': None, 'take_name': '', 'recording': False, 'playing': False,
+                'record_status': 'idle', 'control_hold': True, 'error': str(error),
+                'frame': 1, 'frame_start': 1, 'frame_end': 1, 'fps': 24, 'stream_fps': 0,
+                'export': self.export_state, 'overview': {'zones': [], 'ready': False},
+                'projects': {'active': None, 'items': []}, 'briefs': {'revision': 0, 'items': []},
+                'story': [], 'subjects': [], 'http_url': self.http_url, 'https_url': self.https_url}
+
+    def _refresh_state(self):
         camera = self.scene.camera
+        if not self.valid_camera(camera):
+            camera = None
         take = self.recorded_take_info(camera.name) if camera else None
         take = take or self.recorded_take_info()
         self.state = {'ok': True, 'connected': not self.closed,
@@ -829,23 +1016,30 @@ class Viewfinder:
             'project_event':getattr(self,'project_event',0),'project_message':getattr(self,'project_message',''),
             'scene_title': str(self.scene.get('previs_title','空间与镜头，一起预演。')),
             'scene_subtitle': str(self.scene.get('previs_subtitle','同一时间轴上的空间总览与真实取景。')),
-            'story': json.loads(self.scene.get('previs_story','[]')),
-            'subjects': json.loads(self.scene.get('previs_subjects','[]')),
+            'story': json_list(self.scene, 'previs_story'),
+            'subjects': json_list(self.scene, 'previs_subjects'),
             'http_url': self.http_url, 'https_url': self.https_url}
 
     def close(self):
+        if self.closed:
+            return
         self.closed = True
         if self.recording:
-            self.process({'type': 'stop'})
+            try:
+                self.process({'type': 'stop'})
+            except (ReferenceError, RuntimeError, ValueError):
+                self.interrupt_recording('场景已移除，已停止录制')
         if bpy.app.timers.is_registered(self.tick):
             bpy.app.timers.unregister(self.tick)
-        bpy.types.SpaceView3D.draw_handler_remove(self.handle, 'WINDOW')
+        if getattr(self, 'handle', None) is not None:
+            try:
+                bpy.types.SpaceView3D.draw_handler_remove(self.handle, 'WINDOW')
+            except (ReferenceError, ValueError):
+                pass
+            self.handle = None
         for server in self.servers:
             threading.Thread(target=lambda s=server: (s.shutdown(), s.server_close()), daemon=True).start()
-        if self.offscreen:
-            self.offscreen.free()
-        if self.overview_offscreen:
-            self.overview_offscreen.free()
+        self.release_offscreen('offscreen')
         self.dispose_overview()
 
 class WBVCAM_OT_start(bpy.types.Operator):
@@ -907,11 +1101,17 @@ CLASSES = (WBVCAM_OT_start, WBVCAM_OT_stop, WBVCAM_OT_open, WBVCAM_PT_panel)
 def register():
     for cls in CLASSES:
         bpy.utils.register_class(cls)
+    for handlers in (bpy.app.handlers.load_pre, bpy.app.handlers.undo_pre, bpy.app.handlers.redo_pre):
+        if release_before_data_change not in handlers:
+            handlers.append(release_before_data_change)
 
 def unregister():
     global SERVICE
     if SERVICE:
         SERVICE.close()
         SERVICE = None
+    for handlers in (bpy.app.handlers.load_pre, bpy.app.handlers.undo_pre, bpy.app.handlers.redo_pre):
+        if release_before_data_change in handlers:
+            handlers.remove(release_before_data_change)
     for cls in reversed(CLASSES):
         bpy.utils.unregister_class(cls)

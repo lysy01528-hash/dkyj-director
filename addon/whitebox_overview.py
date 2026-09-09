@@ -8,27 +8,38 @@ from mathutils import Vector, Quaternion
 
 MAX_ZONES = 8
 
+def live_id(value, collection):
+    try:
+        return value is not None and collection.get(value.name) == value
+    except ReferenceError:
+        return False
+
+def remove_unused_data(data):
+    for collection in (bpy.data.meshes, bpy.data.curves, bpy.data.cameras):
+        if live_id(data, collection):
+            if data.users == 0:
+                collection.remove(data)
+            return
+
 def cleanup_saved_overviews():
     """Drop a disposable overview accidentally included by a manual Blender save."""
     for scene in list(bpy.data.scenes):
-        if not scene.get('previs_overview_owned'):
+        if not live_id(scene, bpy.data.scenes) or not scene.get('previs_overview_owned'):
             continue
         data_blocks=[]
         for ob in list(scene.objects):
-            if ob.get('previs_overview_owned'):
+            if live_id(ob, bpy.data.objects) and ob.get('previs_overview_owned'):
                 data_blocks.append(ob.data)
                 bpy.data.objects.remove(ob,do_unlink=True)
         collections=list(scene.collection.children)
         world=scene.world
         bpy.data.scenes.remove(scene)
         for data in data_blocks:
-            if data and data.users==0:
-                if isinstance(data,bpy.types.Mesh):bpy.data.meshes.remove(data)
-                elif isinstance(data,bpy.types.Curve):bpy.data.curves.remove(data)
-                elif isinstance(data,bpy.types.Camera):bpy.data.cameras.remove(data)
+            remove_unused_data(data)
         for collection in collections:
-            if collection.users==0:bpy.data.collections.remove(collection)
-        if world and world.users==0:bpy.data.worlds.remove(world)
+            if live_id(collection,bpy.data.collections) and collection.users==0 and not collection.objects:
+                bpy.data.collections.remove(collection)
+        if live_id(world,bpy.data.worlds) and world.users==0:bpy.data.worlds.remove(world)
     for mat in list(bpy.data.materials):
         if mat.get('previs_overview_owned') and mat.users==0:bpy.data.materials.remove(mat)
 
@@ -113,10 +124,13 @@ def _route(camera):
 
 class OverviewRig:
     def __init__(self, source_scene):
+        self.closed = False
+        self.owned_data = []
         self.source_scene = source_scene
         self.scene = bpy.data.scenes.new('WB_Overview_'+source_scene.name)
         self.scene['previs_overview_owned'] = True
         self.collection = bpy.data.collections.new('WB_OverviewHelpers')
+        self.collection['previs_overview_owned'] = True
         self.scene.collection.children.link(self.collection)
         self.objects, self.materials = [], []
         self.zones = read_zones(source_scene)
@@ -204,7 +218,7 @@ class OverviewRig:
         self.frustum_lens=key
 
     def object(self,name,data):
-        ob=bpy.data.objects.new(name,data);self.collection.objects.link(ob);self.objects.append(ob);ob['previs_overview_owned']=True;return ob
+        ob=bpy.data.objects.new(name,data);self.collection.objects.link(ob);self.objects.append(ob);self.owned_data.append(data);ob['previs_overview_owned']=True;return ob
 
     def material(self,name,hx):
         # Blender stores linear RGB; convert from the same sRGB hex shown in the legend.
@@ -224,18 +238,19 @@ class OverviewRig:
         data.materials.append(material);return self.object(name,data)
 
     def remove_object(self,ob):
-        data=ob.data
-        if ob in self.objects:self.objects.remove(ob)
-        bpy.data.objects.remove(ob,do_unlink=True)
-        if data and data.users==0:
-            if isinstance(data,bpy.types.Mesh):bpy.data.meshes.remove(data)
-            elif isinstance(data,bpy.types.Curve):bpy.data.curves.remove(data)
-            elif isinstance(data,bpy.types.Camera):bpy.data.cameras.remove(data)
+        # External deletion may already have removed the object or its data.
+        self.objects = [item for item in self.objects if item is not ob]
+        if live_id(ob, bpy.data.objects):
+            data = ob.data
+            bpy.data.objects.remove(ob, do_unlink=True)
+            self.owned_data = [item for item in self.owned_data if item is not data]
+            remove_unused_data(data)
 
     def configure(self):
         s=self.scene;s.render.engine='BLENDER_WORKBENCH';s.render.resolution_x=1280;s.render.resolution_y=720;s.render.resolution_percentage=100
         s.display.shading.light='STUDIO';s.display.shading.color_type='MATERIAL';s.display.shading.show_shadows=False;s.display.shading.show_cavity=True
         s.display.shading.background_type='WORLD';s.world=bpy.data.worlds.new('WBOverviewWorld');s.world.color=(.83,.85,.81)
+        self.world = s.world
         s.view_settings.view_transform='Standard';s.render.fps=self.source_scene.render.fps;s.render.fps_base=self.source_scene.render.fps_base
 
     def fit(self,cam):
@@ -262,6 +277,8 @@ class OverviewRig:
         self.follow_anchor=self.route[0].copy() if self.route else (cam.matrix_world.translation.copy() if cam else Vector())
 
     def update(self,camera=None,frame=None):
+        if not self.is_valid():
+            raise ReferenceError('空间总览的场景或辅助对象已移除，需要重建')
         cam=camera or self.source_scene.camera
         pose=cam.matrix_world.copy() if cam else None
         if frame is not None and self.scene.frame_current!=int(frame):self.scene.frame_set(int(frame))
@@ -292,11 +309,42 @@ class OverviewRig:
         self.scene.view_layers[0].update()
         return self.scene
 
+    def is_valid(self):
+        if (self.closed or not live_id(self.source_scene, bpy.data.scenes)
+                or not live_id(self.scene, bpy.data.scenes)
+                or not live_id(self.collection, bpy.data.collections)
+                or not live_id(self.camera, bpy.data.objects)
+                or not live_id(self.camera.data, bpy.data.cameras)
+                or not live_id(self.world, bpy.data.worlds)):
+            return False
+        if (self.scene.camera != self.camera or self.scene.world != self.world
+                or self.scene.collection.children.get(self.collection.name) != self.collection):
+            return False
+        for obj in self.objects:
+            if not live_id(obj, bpy.data.objects) or self.scene.objects.get(obj.name) != obj:
+                return False
+            if obj.data is None:
+                return False
+        return all(live_id(mat, bpy.data.materials) for mat in self.materials)
+
     def close(self):
-        world=self.scene.world
-        for ob in list(self.objects):self.remove_object(ob)
-        bpy.data.scenes.remove(self.scene)
-        if self.collection.users==0:bpy.data.collections.remove(self.collection)
+        if self.closed:
+            return
+        self.closed = True
+        for ob in list(self.objects):
+            self.remove_object(ob)
+        if live_id(self.scene, bpy.data.scenes):
+            bpy.data.scenes.remove(self.scene)
+        if live_id(self.collection, bpy.data.collections) and self.collection.users == 0:
+            bpy.data.collections.remove(self.collection)
+        for data in self.owned_data:
+            remove_unused_data(data)
         for mat in self.materials:
-            if mat.users==0:bpy.data.materials.remove(mat)
-        if world and world.users==0:bpy.data.worlds.remove(world)
+            if live_id(mat, bpy.data.materials) and mat.users == 0:
+                bpy.data.materials.remove(mat)
+        if live_id(self.world, bpy.data.worlds) and self.world.users == 0:
+            bpy.data.worlds.remove(self.world)
+        self.objects = []; self.materials = []; self.owned_data = []
+        self.scene = self.source_scene = self.collection = self.world = self.camera = None
+        self.camera_model = self.route_object = None
+        self.frustum_objects = []; self.number_plates = []

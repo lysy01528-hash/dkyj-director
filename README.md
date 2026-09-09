@@ -9,7 +9,7 @@ English | [简体中文](README.zh-CN.md)
 
 ![Steamship spatial previs](.github/assets/steamship-board.png)
 
-**0.7.0-preview.4 — macOS / Windows public preview.**
+**0.7.0-preview.5 — macOS / Windows public preview.**
 
 [Included examples: Room + Steamship](samples/README.md) · [Release notes](docs/release-notes.md)
 
