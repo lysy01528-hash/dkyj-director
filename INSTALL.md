@@ -44,7 +44,7 @@ Choose the **macOS** or **Windows** ZIP. These are source-and-launcher installat
 Desktop: **macOS + Safari / Windows 11 x64 + Edge**. Mobile support: **iPhone Safari only**. The macOS launcher explicitly opens Safari. Local backend checks use **macOS / Apple Silicon and Blender 5.2.1 LTS**; install **Python 3.11+**. See [release checks](docs/release-check.md) for tested coverage and remaining device checks. Windows paths, LAN selection, Chinese fonts and UTF-8 handling are implemented and branch-tested; native Windows GPU/phone validation remains pending. Linux is not a supported release target.
 
 1. Download [Blender](https://www.blender.org/download/) (macOS Apple Silicon on M-series Macs; install in Applications) and [Python 3.11+](https://www.python.org/downloads/macos/) from their official sites.
-2. Download the [macOS or Windows installation ZIP from Releases](https://github.com/wangjiake666/dkyj-director/releases/tag/v0.8.0-preview.3), then extract it. The repository’s **Code → Download ZIP** contains the download guide, not the application.
+2. Download the [macOS or Windows installation ZIP from Releases](https://github.com/wangjiake666/dkyj-director/releases/tag/v0.8.0-preview.3), then extract it. The repository’s **Code → Download ZIP** contains the guide and nested installer ZIPs; extract the matching ZIP in `downloads/` before setup.
 3. Open a terminal in the extracted directory and run:
 
 ```sh

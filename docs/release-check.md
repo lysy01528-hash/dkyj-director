@@ -67,3 +67,8 @@ Windows 自动搜索 Blender、虚拟环境路径、中文路径、中文字体�
 ## 0.7.0-preview.5 · 2026-09-09
 
 删除 Take / Scene 与失效 RNA 修复，通过八项删除回归、七种总览清理场景、项目缓存重新加载、录制导出回归，以及原生视窗中的 GPU/HTTP/Undo 恢复检查。测试在 macOS Blender 5.2.1 上执行。[完整修复记录](fixes/deleted-camera-recovery.md)。
+
+
+### 2026-09-12 · 公开下载回验
+
+已发布 [0.8.0-preview.3](https://github.com/wangjiake666/dkyj-director/releases/tag/v0.8.0-preview.3)，原名字与链接不变。两个系统包与各自 SHA-256 文件均通过匿名 API 下载和仓库镜像直接下载，字节数与本地 SHA-256 一致。首页及 Release 顶部指向固定版本镜像，不依赖当时返回 404 的新 Release 附件直链。两个安装包各含 103 个清单文件，包含对应 GPL 应用源码。

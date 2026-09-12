@@ -44,7 +44,7 @@ python3 scripts/agent_config.py
 
 ## 在 GitHub 上如何使用？
 
-GitHub 原链接现在作为下载入口。请下载 Releases 里的 Mac / Windows 安装包，内含对应源码；Code → Download ZIP 只有下载说明，不能直接启动。**完整导演台在使用者自己的电脑上运行，不能作为纯静态页面直接部署到 GitHub Pages 后使用。** GitHub Pages 可以放说明、图片或预先渲染的视频；它不能启动本机 Blender、运行 Python 后端或处理 GPU 取景。依据：[GitHub Pages 官方说明](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages)。
+GitHub 原链接现在作为下载入口。请下载 Releases 里的 Mac / Windows 安装包，内含对应源码；Code → Download ZIP 含说明和 downloads/ 内的安装 ZIP，需再次解压对应系统的安装包才能启动。**完整导演台在使用者自己的电脑上运行，不能作为纯静态页面直接部署到 GitHub Pages 后使用。** GitHub Pages 可以放说明、图片或预先渲染的视频；它不能启动本机 Blender、运行 Python 后端或处理 GPU 取景。依据：[GitHub Pages 官方说明](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages)。
 
 推荐流程：下载源码 → 在电脑上运行安装脚本 → 启动 Blender 与本地导演台 → 可选接入自己的 Agent → 手机打开同一 Wi-Fi 下的本地取景页 → 录镜头并导出。
 

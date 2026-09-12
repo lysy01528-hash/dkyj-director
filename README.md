@@ -14,8 +14,8 @@ The repository name and link stay the same. This is the official download and do
 
 | Platform | Installation bundle | Checksum | Desktop browser |
 | --- | --- | --- | --- |
-| macOS | [Download ZIP](https://raw.githubusercontent.com/wangjiake666/dkyj-director/main/downloads/dkyj-director-0.8.0-preview.3-macos.zip) | [SHA-256](https://raw.githubusercontent.com/wangjiake666/dkyj-director/main/downloads/dkyj-director-0.8.0-preview.3-macos.sha256) | Safari |
-| Windows 11 x64 | [Download ZIP](https://raw.githubusercontent.com/wangjiake666/dkyj-director/main/downloads/dkyj-director-0.8.0-preview.3-windows.zip) | [SHA-256](https://raw.githubusercontent.com/wangjiake666/dkyj-director/main/downloads/dkyj-director-0.8.0-preview.3-windows.sha256) | Edge |
+| macOS | [Download ZIP](https://raw.githubusercontent.com/wangjiake666/dkyj-director/814c65fc531edf4cda1ecf2434faa48ed41ee9a0/downloads/dkyj-director-0.8.0-preview.3-macos.zip) | [SHA-256](https://raw.githubusercontent.com/wangjiake666/dkyj-director/814c65fc531edf4cda1ecf2434faa48ed41ee9a0/downloads/dkyj-director-0.8.0-preview.3-macos.sha256) | Safari |
+| Windows 11 x64 | [Download ZIP](https://raw.githubusercontent.com/wangjiake666/dkyj-director/814c65fc531edf4cda1ecf2434faa48ed41ee9a0/downloads/dkyj-director-0.8.0-preview.3-windows.zip) | [SHA-256](https://raw.githubusercontent.com/wangjiake666/dkyj-director/814c65fc531edf4cda1ecf2434faa48ed41ee9a0/downloads/dkyj-director-0.8.0-preview.3-windows.sha256) | Edge |
 
 **Phone: iPhone Safari only.** These are source-and-launcher bundles, not standalone EXE/DMG apps. Install [Blender](https://www.blender.org/download/) and [Python 3.11+](https://www.python.org/downloads/) separately. **Code → Download ZIP downloads the guide and nested installation ZIPs; extract the platform ZIP in `downloads/` before setup.** GitHub Pages cannot run the Blender backend.
 

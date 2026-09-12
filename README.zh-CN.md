@@ -10,8 +10,8 @@
 
 | 电脑 | 安装包 | 校验 | 电脑浏览器 |
 | --- | --- | --- | --- |
-| macOS | [下载 Mac 版](https://raw.githubusercontent.com/wangjiake666/dkyj-director/main/downloads/dkyj-director-0.8.0-preview.3-macos.zip) | [SHA-256](https://raw.githubusercontent.com/wangjiake666/dkyj-director/main/downloads/dkyj-director-0.8.0-preview.3-macos.sha256) | Safari |
-| Windows 11 x64 | [下载 Windows 版](https://raw.githubusercontent.com/wangjiake666/dkyj-director/main/downloads/dkyj-director-0.8.0-preview.3-windows.zip) | [SHA-256](https://raw.githubusercontent.com/wangjiake666/dkyj-director/main/downloads/dkyj-director-0.8.0-preview.3-windows.sha256) | Edge |
+| macOS | [下载 Mac 版](https://raw.githubusercontent.com/wangjiake666/dkyj-director/814c65fc531edf4cda1ecf2434faa48ed41ee9a0/downloads/dkyj-director-0.8.0-preview.3-macos.zip) | [SHA-256](https://raw.githubusercontent.com/wangjiake666/dkyj-director/814c65fc531edf4cda1ecf2434faa48ed41ee9a0/downloads/dkyj-director-0.8.0-preview.3-macos.sha256) | Safari |
+| Windows 11 x64 | [下载 Windows 版](https://raw.githubusercontent.com/wangjiake666/dkyj-director/814c65fc531edf4cda1ecf2434faa48ed41ee9a0/downloads/dkyj-director-0.8.0-preview.3-windows.zip) | [SHA-256](https://raw.githubusercontent.com/wangjiake666/dkyj-director/814c65fc531edf4cda1ecf2434faa48ed41ee9a0/downloads/dkyj-director-0.8.0-preview.3-windows.sha256) | Edge |
 
 **手机仅支持 iPhone Safari。请下载上表安装包，Code → Download ZIP 包含说明与 downloads/ 下的安装 ZIP，仍需解压其中对应系统的 ZIP。** 软件在自己电脑的 Blender 中运行，不是打开 GitHub 就能使用的云端软件。包内提供源码与启动器，需要另装 [Blender](https://www.blender.org/download/) 和 [Python 3.11+](https://www.python.org/downloads/)，不是独立 EXE/DMG。
 

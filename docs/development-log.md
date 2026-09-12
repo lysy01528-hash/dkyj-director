@@ -141,3 +141,8 @@ Changed the export download link into a solid green button with white text, arro
 修复相机录制归属、Scene/Object 有效性验证、总览资源清理、项目缓存失效、Undo/Redo/文件加载前释放绘制资源，并为异常状态提供不访问旧 RNA 的 JSON 回退。删除当前镜头后保留其他机位与已有录制；缺少相机时恢复 Camera_Phone。
 
 已通过 8 项删除回归、7 种总览清理场景、7 项原生视窗/GPU/HTTP/Undo 检查，项目缓存重新加载与录制导出回归通过。实际测试环境：macOS / Blender 5.2.1 LTS；未验证 Windows 原生 GPU。详见 [修复记录](fixes/deleted-camera-recovery.md)。
+
+
+### 2026-09-12 · 公开下载回验
+
+已发布 [0.8.0-preview.3](https://github.com/wangjiake666/dkyj-director/releases/tag/v0.8.0-preview.3)，原名字与链接不变。两个系统包与各自 SHA-256 文件均通过匿名 API 下载和仓库镜像直接下载，字节数与本地 SHA-256 一致。首页及 Release 顶部指向固定版本镜像，不依赖当时返回 404 的新 Release 附件直链。两个安装包各含 103 个清单文件，包含对应 GPL 应用源码。

@@ -9,8 +9,9 @@ No separate download repository or visibility change is needed.
 
 Download the macOS or Windows ZIP from [Releases](https://github.com/wangjiake666/dkyj-director/releases/tag/v0.8.0-preview.3).
 Each platform uses one Lite/Pro package and includes the corresponding application
-source, dependencies, GPL license and a per-file SHA-256 manifest. **Code → Download ZIP**
-only downloads this repository’s documentation, not the runnable application.
+source, dependencies, GPL license and a per-file SHA-256 manifest. The repository also keeps identical installer mirrors in `downloads/`.
+**Code → Download ZIP** includes the guide and nested ZIPs; extract the matching
+platform ZIP before installation. Homepage links use verified fixed-version mirrors.
 See [source availability](source-availability.md).
 
 Development files and seller tools remain local. Signing keys, activation-code
@@ -27,7 +28,7 @@ is a software preview, not a verified launch of automated paid delivery.
 ## 发布和升级
 
 1. 构建并校验两个平台包、SHA-256、逐文件清单、隐私排除与文档链接。
-2. 公开仓库仅同步下载说明、公开案例、许可证和日志，保留原名字与链接。
+2. 公开仓库同步下载说明、公开案例、许可证、日志和安装包镜像，保留原名字与链接。
 3. Release 标为预览版，上传 Mac / Windows 共用 Lite-Pro 包及校验文件。
 4. 无登录下载两个包并回验哈希，再记录发布地址和结果。
 

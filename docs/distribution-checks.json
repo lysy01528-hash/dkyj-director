@@ -21,5 +21,9 @@
     "python": 15,
     "gamepad_js": 45,
     "web_controls": "pass"
-  }
+  },
+  "published_release": "https://github.com/wangjiake666/dkyj-director/releases/tag/v0.8.0-preview.3",
+  "anonymous_api_asset_downloads": "pass",
+  "anonymous_installer_mirror_downloads": "pass",
+  "mirror_commit": "814c65fc531edf4cda1ecf2434faa48ed41ee9a0"
 }
