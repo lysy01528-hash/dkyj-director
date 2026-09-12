@@ -1,5 +1,46 @@
 # Changelog
 
+## 0.8.0-preview.3 — Public download preview, 2026-09-12
+
+- Keep the existing GitHub repository name and URL; the current tree becomes a bilingual download and documentation hub.
+- Publish shared Lite/Pro macOS and Windows source-and-launcher bundles with the production v1 verification key and SHA-256 manifests.
+- Include Xbox / PS5 profiles, elevation and pitch, three saved Lite scenes per project, Pro controller recording, Preview export watermarks and camera-deletion recovery.
+- Keep the room and steamship examples, phone pairing, Blender/MCP onboarding and separate or combined 16:9 views.
+- Preserve corresponding GPL application source in each bundle; seller tools, credentials, stock and personal projects stay out of public distribution.
+- Afdian automatic purchase/delivery, native Windows GPU, iPhone and PS5 hardware acceptance remain pending.
+
+## 0.8.0-preview.2 — Local production activation readiness
+
+- Embed the author-approved production v1 public key; signed Pro codes now activate offline.
+- Preserve preview.1 packages and rebuild both platforms with the same verifier key.
+- Verify 10 issued codes, fresh-process restart, wrong-code preservation and rejection of unrelated signing keys.
+- Make client-package licensing tests independent of excluded developer issuer tools.
+- Afdian purchase/delivery and GitHub publication are still pending.
+
+
+## 0.8.0-preview.1 — Local build, 2026-09-12
+
+- Lite and Pro now share one macOS/Windows source-and-launcher package. The production Pro key/product are intentionally unconfigured pending owner setup and real delivery acceptance.
+- Added strict Ed25519 offline license validation, per-user atomic storage, masked license status, secure activation transport and a compact version panel. The developer issuer stays outside user packages.
+- Added project-owned scenes: Lite saves three, excess scenes remain temporary until a user manually deletes a saved scene. Existing projects migrate with an index backup; deletion retains a trash copy. Removed Scene wrappers no longer break the new catalog.
+- Kept gamepad camera preview free; Pro gates gamepad recording. Manual recording remains available with Preview watermarks. Added controller ownership, neutral shutdown and heartbeat expiry without changing joystick mathematics.
+- Added an isolated built-in demo process for controller trial recording. Formal project writes and demo export are denied.
+- Applied Preview marking to POV, overview, board, combined video, stills and reference metadata. Real Blender short exports passed all three modes, including noninteger FPS and Pro passthrough.
+- Added CLI/MCP scene commands that wait for the backend project event, and updated source-availability and dependency notices.
+- This is a local development build. Real Afdian purchase/delivery, production activation, Windows/iPhone and DualSense hardware acceptance are not complete. Repository privacy/download-site migration has not run.
+
+## Controller development baseline (previously unreleased)
+
+- Added Xbox Series X|S controller camera control to the web viewfinder: left stick movement, right stick turn/pitch, LT/RT elevation and LB/RB focal length.
+- Added the four screen controls for elevation and pitch, the waiting/ready/active connection states and the world-coordinate camera Z display. Recording remains on the existing web buttons; controller A/B are not part of this version.
+- Added focus-loss, background-pause and disconnect/reconnect centering behavior, with same-page arbitration against phone orientation, keyboard, dragging and screen controls. This baseline originally had no backend lock; 0.8 adds controller ownership and expiry.
+- Passed 45 production `web/gamepad.js` and `app.js` behavior checks with at most one concurrent control request. Synthetic input using the production mapping recorded and replayed a 41-frame, 1.708-second Take in Blender 5.2.1 LTS, including elevation, position, pitch and focal length, and produced a 1280×720 MP4.
+- Fixed timeline `frame_set` restoring old focal-length keyframes over live zoom during recording; live zoom now enters the Take. Previous Mac Safari 18.6 hardware probing read both sticks and LT/RT/LB/RB; this version's hardware recording in Blender, Windows Edge and iPhone Safari remain unverified.
+- See [Xbox / PS5 controller camera control](docs/gamepad.md).
+- Added a compact Xbox / PS5 profile selector beside the controller button. Xbox remains the default; the selected value is stored in the browser and invalid values fall back to Xbox.
+- Added PS5 standard-layout mapping: L2/R2 for lowering/raising and L1/R1 for focal length. Only `mapping: "standard"` is accepted; PS5 hardware has not been tested; the touchpad, face buttons and vibration are not used.
+- Switching profiles pauses the current controller, sends zero input, resets centering protection and requires clicking controller enable again. Production tests cover profile memory, fallback, PS5 mapping, labels, non-standard rejection and re-centering; no PS5 hardware is available for real-device verification.
+
 ## 0.7.0-preview.5 — 2026-09-09
 
 - Recover the phone camera after externally deleting active takes; interrupt a deleted recording safely without keying another camera.

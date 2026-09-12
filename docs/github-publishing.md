@@ -1,37 +1,47 @@
-# Publishing on GitHub / 发布说明
+# GitHub distribution / GitHub 发布方式
 
-Suggested repository name: **dkyj-director**. Display name: **DKYJ Director**. Chinese name: **大开眼界导演台**.
+The public download address stays **https://github.com/wangjiake666/dkyj-director**.
+Version **0.8.0-preview.3** replaces the current repository tree with the bilingual
+download guide, examples and release documentation. The name and URL stay the same.
+No separate download repository or visibility change is needed.
 
-Repository description:
+## Download and source
 
-> Local Blender camera previs with a phone viewfinder, editable blocking, reusable scenes, and optional MCP agent integration.
+Download the macOS or Windows ZIP from [Releases](https://github.com/wangjiake666/dkyj-director/releases/tag/v0.8.0-preview.3).
+Each platform uses one Lite/Pro package and includes the corresponding application
+source, dependencies, GPL license and a per-file SHA-256 manifest. **Code → Download ZIP**
+only downloads this repository’s documentation, not the runnable application.
+See [source availability](source-availability.md).
 
-README.md is the default English landing page; README.zh-CN.md is the Chinese manual. Both include the collaboration contact 826701673@qq.com.
+Development files and seller tools remain local. Signing keys, activation-code
+inventory, account credentials and user projects are excluded. Update the public
+repository with a normal commit based on its existing main branch; do not merge the
+local commercial development branch or rewrite the existing public history.
 
-**Release target: public preview 0.7.0-preview.2. Publish only the clean allowlisted source directory and platform bundles.**
+## Preview status
 
-## Upload the source
+Offline Pro activation is implemented and the production v1 public key is included.
+The Afdian product link and real automatic order delivery are not ready. This release
+is a software preview, not a verified launch of automated paid delivery.
 
-1. Run `python3 scripts/package_release.py --platform all` in the working project.
-2. Create a GitHub repository named `dkyj-director` in your account.
-3. Upload the **contents** of `dist/dkyj-director-0.7.0-preview.2/` to the repository root, including `.github/` and `.gitignore`. Do not upload your working directory or just a ZIP as the only source file.
-4. Keep README.md and LICENSE at the root. You can additionally attach the source ZIP and SHA-256 file to a GitHub Release.
-5. Check the rendered README, image and Chinese-language link. Repository CI performs source checks; it does not prove local Blender rendering or phone operation.
+## 发布和升级
 
-GitHub's website upload or GitHub Desktop can upload the prepared folder. For a terminal workflow, initialize git **inside the clean release folder**, commit its contents, add the repository URL provided by GitHub, and push. Authenticate with your own GitHub client; do not place credentials in commands or docs.
+1. 构建并校验两个平台包、SHA-256、逐文件清单、隐私排除与文档链接。
+2. 公开仓库仅同步下载说明、公开案例、许可证和日志，保留原名字与链接。
+3. Release 标为预览版，上传 Mac / Windows 共用 Lite-Pro 包及校验文件。
+4. 无登录下载两个包并回验哈希，再记录发布地址和结果。
 
-## About GitHub Pages
+升级前保存工程、关闭 Blender 并备份原目录。新版完整解压到新目录，复制原
+`projects/` 和 `takes/` 到新版目录，重新运行安装步骤。不要复制旧 `runtime/`、
+证书和 `.venv/`；启动新版后重新扫码。用户授权存于系统用户目录，独立于安装目录。
+旧版本发布记录保留；旧链接、公开副本和 GPL 接收者权利不会被撤回。
 
-No working director backend is deployed through GitHub Pages. Pages supports static site hosting; the renderer needs local Blender/Python/GPU access. The GitHub repository README is enough for download and usage instructions. An optional Pages presentation would be a separate static showcase; none is claimed as deployed in this release.
+macOS 包使用 `.command` 和 Safari；Windows 包使用 `.cmd` 和 Edge。
+手机仅支持 iPhone Safari。需要另装 Blender 和 Python，并非独立 EXE/DMG。
 
-## 中文
+## GitHub Pages
 
-从干净的发行目录上传源码到仓库根目录，GitHub 会直接展示英文 README，点击「简体中文」进入中文版。上传源码不等于部署完整软件；使用者需要下载后在本机安装运行。不要将私人场景、配对 token、证书或录制日志上传。
+GitHub Pages can host a static introduction but cannot run the local Blender renderer.
+See [GitHub Pages documentation](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages).
 
-参考：[GitHub Pages 官方说明](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages)。
-
-发布前核对结果见 [检查记录](release-check.md)。上传当前 0.7 preview.2 干净目录；其中已包含新版手与眼睛 Logo、Safari 安装说明和官方引用。
-
-## 两个平台包
-
-源码仓库仍只有一个：上传无平台后缀的干净 source_directory 内容。GitHub Release 可附两个 ZIP：`dkyj-director-0.7.0-preview.2-macos.zip` 和 `dkyj-director-0.7.0-preview.2-windows.zip`，以及各自 SHA-256。两个包只包含对应系统的双击入口，共享其余核心源码。不是包含 Blender 的离线安装器。
+联系：抖音 **王夹克** · 微信公众号 **大开眼界AI** · **826701673@qq.com**。

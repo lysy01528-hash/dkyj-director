@@ -1,0 +1,25 @@
+{
+  "version": "0.8.0-preview.3",
+  "packages": [
+    {
+      "platform": "macos",
+      "files": 103,
+      "sha256": "274feb1463cdef0538ef5f4864c54a3b7168c5ca855e4361c84d9e851298f3eb",
+      "size": 4677353
+    },
+    {
+      "platform": "windows",
+      "files": 103,
+      "sha256": "f2c1332d4a18b63b46a3a7bff2b5cd5cc1b7d13581366dc645fb34e65cbce399",
+      "size": 4678068
+    }
+  ],
+  "private_material_found": false,
+  "relative_links": "pass",
+  "zip_crc_and_manifests": "pass",
+  "tests": {
+    "python": 15,
+    "gamepad_js": 45,
+    "web_controls": "pass"
+  }
+}

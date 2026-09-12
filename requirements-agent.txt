@@ -1,2 +1,0 @@
-# Optional: enables scripts/agent_server.py in your MCP-capable agent.
-mcp>=1.12,<2
