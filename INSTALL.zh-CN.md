@@ -1,6 +1,6 @@
 # DKYJ Director
 
-**0.8.0-preview.3 · Lite / Pro 公开预览版**
+**0.8.0-preview.6 · Lite / Pro 公开预览版**
 
 Lite 与 Pro 共用一个安装包，Mac / Windows 分别提供启动器。Lite 每项目可保存 **3 个场次**；更多场次可以临时编辑，手动删旧场次腾位后保存。触控、手机体感、键盘录制免费，所有 Lite 导出带水印；手柄免费预览，手柄录制及无水印导出由 Pro 解锁。
 
@@ -40,7 +40,7 @@ python3 scripts/agent_config.py
 
 将输出的 DKYJ 配置加入自己的 Agent，与 Blender MCP 配置并存，然后在 Agent 对话里说「执行下一个 DKYJ 创作任务」。仅连接 MCP 不会自动唤醒所有 Agent；需在 Agent 中启动这次执行。网页不自带模型，不会暗中调用付费接口。
 
-手机端保留大开眼界品牌，欢迎页可进入预演台。完整试用步骤见 [试用指南](docs/trial-guide.md)。请从 [Releases 下载对应系统安装包](https://github.com/wangjiake666/dkyj-director/releases/tag/v0.8.0-preview.3)。
+手机端保留大开眼界品牌，欢迎页可进入预演台。完整试用步骤见 [试用指南](docs/trial-guide.md)。请从 [Releases 下载对应系统安装包](https://github.com/wangjiake666/dkyj-director/releases/tag/v0.8.0-preview.6)。
 
 ## 在 GitHub 上如何使用？
 
